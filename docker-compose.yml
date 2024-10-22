@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+ db:
+  image: postgres:latest
+  restart: always
+  environment:
+   POSTGRES_USER: postgres
+   POSTGRES_PASSWORD: root
+   POSTGRES_DB: simbir_health_db
+  volumes:
+    - ./initdb:/docker-entrypoint-initdb.d
+  ports:
+   - "5454:5432"
+
+ app_1:
+  build: ./microservice_1
+  depends_on:
+   - db
+  ports:
+   - "8081:8081"
+
+ app_2:
+  build: ./microservice_2
+  depends_on:
+   - db
+   - app_1
+  environment:
+    APP_1_URL: http://app_1:8081 
+  ports:
+   - "8082:8082"
+
+ app_3:
+  build: ./microservice_3
+  depends_on:
+   - db
+   - app_1
+   - app_2 
+  environment:
+    APP_1_URL: http://app_1:8081 
+    APP_2_URL: http://app_2:8082 
+  ports:
+   - "8083:8083" 
+
+ app_4: 
+  build: ./microservice_4
+  depends_on:
+   - db
+   - app_1
+   - app_2
+   - app_3
+  environment:
+    POSTGRES_PASSWORD: root
+    DATABASE_URL: postgres://postgres:root@db:5432/simbir_health_db
+    APP_1_URL: http://app_1:8081
+    APP_2_URL: http://app_2:8082 
+    APP_3_URL: http://app_3:8083 
+  ports:
+   - "8084:8084" 
