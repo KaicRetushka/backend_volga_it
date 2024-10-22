@@ -234,9 +234,9 @@ async def change_account(body: data_account, id: int  = Path(...), access_token:
                 is_username = True
                 break
         if(not(is_username)):
-            HTTPException(status_code=400, detail='Вы указали неверный id')
+            raise HTTPException(status_code=400, detail='Вы указали неверный id')
         elif(user['id'] != id):
-            HTTPException(status_code=400, detail='Такой логин уже занят')
+            raise HTTPException(status_code=400, detail='Такой логин уже занят')
         elif(len(body.username) > 100):
             raise HTTPException(status_code = 400, detail = 'Слишком длинный логин')
         elif(len(body.password) > 100):
